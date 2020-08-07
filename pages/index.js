@@ -1,21 +1,29 @@
 import Head from "next/head";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { connect, useDispatch } from "react-redux";
 
-import { listPush, listPop } from "../redux/list/list.actions";
+import { listPush, listPop, requestList } from "../redux/list/list.actions";
 
 import Button from "../components/Button";
 
 function Home({ list }) {
   const { data } = list;
+  console.log(data);
   const [count, setCount] = useState(0);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(requestList());
+  }, []);
+
   const handlePush = useCallback(() => {
-    dispatch(listPush(count));
+    dispatch(
+      listPush({
+        title: count,
+      })
+    );
     setCount(count + 1);
   }, [count]);
-  const handlePop = () => dispatch(listPop());
 
   return (
     <div>
@@ -26,19 +34,14 @@ function Home({ list }) {
       {data && (
         <ul>
           {data.map((item, index) => (
-            <li key={index}>{item}</li>
+            <li key={index}>{item.title}</li>
           ))}
         </ul>
       )}
-      <Button type="button" onClick={handlePush}>
-        {count} 추가
-      </Button>
 
-      {data.length > 0 && (
-        <Button type="button" onClick={handlePop}>
-          {data[0]} 제거
-        </Button>
-      )}
+      <Button type="button" onClick={handlePush}>
+        추가
+      </Button>
     </div>
   );
 }
